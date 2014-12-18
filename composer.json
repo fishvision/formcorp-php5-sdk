@@ -7,5 +7,7 @@
             "email": "alexb@fishvision.com"
         }
     ],
-    "require": {}
+    "require": {
+        "guzzlehttp/guzzle": "~5.0"
+    }
 }
