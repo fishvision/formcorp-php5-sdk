@@ -1,0 +1,11 @@
+{
+    "name": "fishvision/formcorp-php5-sdk",
+    "description": "A PHP5 SDK implementation for FormCorp",
+    "authors": [
+        {
+            "name": "Alex Berriman",
+            "email": "alexb@fishvision.com"
+        }
+    ],
+    "require": {}
+}
