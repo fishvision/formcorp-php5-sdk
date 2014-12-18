@@ -27,7 +27,8 @@ class Constants
     /**
      * @var string The token type
      */
-    const TOKEN_TYPE = 'bearer';
+    const TOKEN_TYPE = 'Bearer';
+    const SIGNATURE_ENCODING = 'UTF-8';
 }
 
 /**
@@ -60,10 +61,10 @@ class Helper
         // Instantiate the guzzle client
         $this->client = new Client([
             'base_url' => API_URL,
-            'headers' => [
-                'authorization' => sprintf('%s %s', Constants::TOKEN_TYPE, $publicKey),
-            ],
         ]);
+
+        // Set the identifying token
+        $this->client->setDefaultOption('headers/Authorization', sprintf('%s %s', Constants::TOKEN_TYPE, $publicKey));
     }
 
     /**
@@ -83,10 +84,45 @@ class Helper
         // Send the request
         switch (strtoupper($requestMethod)) {
             case Constants::METHOD_GET:
-                return $this->client->get($uri);
+                return $this->get($uri, $data);
 
         }
 
         return null;
+    }
+
+    /**
+     * @param $uri
+     * @param $data
+     */
+    public function get($uri, $data)
+    {
+        return $this->client->get($uri, [
+            'headers' => [
+                'Signature' => $this->calculateSignature(Constants::METHOD_GET, $uri),
+            ],
+        ]);
+    }
+
+    /**
+     * Calculates the signature to send through with the API request.
+     * @param $requestMethod
+     * @param $uri
+     * @param array $data
+     * @return string
+     */
+    private function calculateSignature($requestMethod, $uri, $data = [])
+    {
+        // Calculate the encoded hash using the request
+        $plaintext = json_encode([
+            'method' => $requestMethod,
+            'uri' => $uri,
+            'data' => $data,
+        ]);
+
+        $plaintext = mb_convert_encoding($plaintext, Constants::SIGNATURE_ENCODING);
+        $hash = base64_encode(hash_hmac('sha1', $plaintext, $this->secret));
+
+        return $hash;
     }
 }
