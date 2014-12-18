@@ -1,6 +1,6 @@
 <?php
 
-namespace fishvision\formcorpsdk;
+namespace formcorp\sdk;
 
 /**
  * Class FCHelper
