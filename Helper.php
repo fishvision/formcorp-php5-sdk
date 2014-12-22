@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 /**
  * @constant string The url to access the API
  */
-defined(__NAMESPACE__ . '\API_URL') or define('API_URL', 'https://api.formcorp.com.au');
+defined(__NAMESPACE__ . '\API_URL') or define(__NAMESPACE__ . '\API_URL', 'https://api.formcorp.com.au');
 
 /**
  * Class Constants
@@ -83,8 +83,13 @@ class Helper
 
         // Send the request
         switch (strtoupper($requestMethod)) {
+            // Send a GET HTTP request
             case Constants::METHOD_GET:
                 return $this->get($uri, $data);
+
+            // Send a POST HTTP request
+            case Constants::METHOD_POST:
+                return $this->post($uri, $data);
 
         }
 
@@ -105,6 +110,20 @@ class Helper
     }
 
     /**
+     * @param $uri
+     * @param array $data
+     */
+    public function post($uri, $data = [])
+    {
+        return $this->client->post($uri, [
+            'body' => $data,
+            'headers' => [
+                'Signature' => $this->calculateSignature(Constants::METHOD_POST, $uri, $data),
+            ]
+        ]);
+    }
+
+    /**
      * Calculates the signature to send through with the API request.
      * @param $requestMethod
      * @param $uri
@@ -119,6 +138,7 @@ class Helper
             'uri' => $uri,
             'data' => $data,
         ]);
+        var_dump($plaintext);
 
         $plaintext = mb_convert_encoding($plaintext, Constants::SIGNATURE_ENCODING);
         $hash = base64_encode(hash_hmac('sha1', $plaintext, $this->secret));
