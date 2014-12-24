@@ -85,15 +85,56 @@ class Helper
         switch (strtoupper($requestMethod)) {
             // Send a GET HTTP request
             case Constants::METHOD_GET:
-                return $this->get($uri, $data);
+                $this->result = $this->get($uri, $data);
+                break;
 
             // Send a POST HTTP request
             case Constants::METHOD_POST:
-                return $this->post($uri, $data);
+                $this->result = $this->post($uri, $data);
+                break;
 
         }
 
-        return null;
+        // Return a json result
+        try {
+            return $this->result->json();
+        } catch (\Exception $e) {
+            return [
+                'error' => true,
+                'type' => 'exception',
+                'message' => 'Unable to decode JSON data',
+            ];
+        }
+    }
+
+    /**
+     * @return array|bool
+     */
+    public function error()
+    {
+        if (!isset($this->result)) {
+            return [
+                'error' => true,
+                'type' => 'undefined',
+                'message' => 'No result defined'
+            ];
+        }
+
+        // Try to decode the json result
+        try {
+            $result = $this->result->json();
+            if (isset($result['error'])) {
+                return $result;
+            }
+        } catch (\Exception $e) {
+            return [
+                'error' => true,
+                'type' => 'exception',
+                'message' => 'Unable to decode JSON data',
+            ];
+        }
+
+        return false;
     }
 
     /**
@@ -138,7 +179,6 @@ class Helper
             'uri' => $uri,
             'data' => $data,
         ]);
-        var_dump($plaintext);
 
         $plaintext = mb_convert_encoding($plaintext, Constants::SIGNATURE_ENCODING);
         $hash = base64_encode(hash_hmac('sha1', $plaintext, $this->secret));
