@@ -36,7 +36,7 @@ class Constants
  * @package fishvision\formcorpsdk
  * @author Alex Berriman <alexb@fishvision.com>
  */
-class Helper
+class Api
 {
     /**
      * @var string The public key for the application
