@@ -74,7 +74,7 @@ class Api
      * @param array $data
      * @return null|void
      */
-    public function api($uri, $requestMethod = Constants::METHOD_GET, $data = [])
+    public function call($uri, $requestMethod = Constants::METHOD_GET, $data = [])
     {
         // Prepend with a slash
         if (substr($uri, 0, 1) !== '/') {
