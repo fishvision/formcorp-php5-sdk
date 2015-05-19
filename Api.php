@@ -10,28 +10,6 @@ use GuzzleHttp\Client;
 defined(__NAMESPACE__ . '\API_URL') or define(__NAMESPACE__ . '\API_URL', 'https://api.formcorp.com.au');
 
 /**
- * Class Constants
- * @package formcorp\sdk
- * @author Alex Berriman <alexb@fishvision.com>
- */
-class Constants
-{
-    /**
-     * HTTP request methods
-     */
-    const METHOD_GET = 'GET';
-    const METHOD_POST = 'POST';
-    const METHOD_DELETE = 'DELETE';
-    const METHOD_PUT = 'PUT';
-
-    /**
-     * @var string The token type
-     */
-    const TOKEN_TYPE = 'Bearer';
-    const SIGNATURE_ENCODING = 'UTF-8';
-}
-
-/**
  * Class FCHelper
  * @package fishvision\formcorpsdk
  * @author Alex Berriman <alexb@fishvision.com>
@@ -140,6 +118,7 @@ class Api
     /**
      * @param $uri
      * @param $data
+     * @return \GuzzleHttp\Message\FutureResponse|\GuzzleHttp\Message\ResponseInterface|\GuzzleHttp\Ring\Future\FutureInterface|mixed|null
      */
     public function get($uri, $data)
     {
@@ -153,6 +132,7 @@ class Api
     /**
      * @param $uri
      * @param array $data
+     * @return \GuzzleHttp\Message\FutureResponse|\GuzzleHttp\Message\ResponseInterface|\GuzzleHttp\Ring\Future\FutureInterface|mixed|null
      */
     public function post($uri, $data = [])
     {
