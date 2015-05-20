@@ -7,12 +7,13 @@ use GuzzleHttp\Client;
 /**
  * @constant string The url to access the API
  */
-defined(__NAMESPACE__ . '\API_URL') or define(__NAMESPACE__ . '\API_URL', 'https://api.formcorp.com.au');
+//defined(__NAMESPACE__ . '\API_URL') or define(__NAMESPACE__ . '\API_URL', 'https://api.formcorp.com.au');
+defined(__NAMESPACE__ . '\API_URL') or define(__NAMESPACE__ . '\API_URL', 'http://192.168.247.129:9001');
 
 /**
  * Class FCHelper
  * @package fishvision\formcorpsdk
- * @author Alex Berriman <alexb@fishvision.com>
+ * @author Alex Berriman <aberriman@formcorp.com.au>
  */
 class Api
 {
@@ -145,6 +146,20 @@ class Api
     }
 
     /**
+     * Generate an access token to the API
+     * @return string|bool
+     */
+    public function generateToken()
+    {
+        $request = $this->call('auth/token', Constants::METHOD_POST, [
+            'timestamp' => time(),
+            'nonce' => $this->generateNonce(),
+        ]);
+
+        return isset($request['token']) ? $request['token'] : false;
+    }
+
+    /**
      * Calculates the signature to send through with the API request.
      * @param $requestMethod
      * @param $uri
@@ -153,6 +168,13 @@ class Api
      */
     private function calculateSignature($requestMethod, $uri, $data = [])
     {
+        // PHP is loosely typed. Attempt to convert non string elements to string
+        foreach ($data as &$val) {
+            if (!is_string($val)) {
+                $val = strval($val);
+            }
+        }
+
         // Calculate the encoded hash using the request
         $plaintext = json_encode([
             'method' => $requestMethod,
@@ -164,5 +186,19 @@ class Api
         $hash = base64_encode(hash_hmac('sha1', $plaintext, $this->secret));
 
         return $hash;
+    }
+
+    /**
+     * @param int $bytes
+     * @return string
+     */
+    private function generateNonce($bytes = 32)
+    {
+        $nonce = '';
+        for ($i = 0; $i < $bytes; ++$i) {
+            $nonce .= chr(mt_rand(0, 255));
+        }
+
+        return base64_encode($nonce);
     }
 }
