@@ -8,7 +8,7 @@ use GuzzleHttp\Client;
  * @constant string The url to access the API
  */
 defined(__NAMESPACE__ . '\API_URL') or define(__NAMESPACE__ . '\API_URL', 'https://api.formcorp.com.au');
-//defined(__NAMESPACE__ . '\API_URL') or define(__NAMESPACE__ . '\API_URL', 'http://192.168.247.129:9001');
+//defined(__NAMESPACE__ . '\API_URL') or define(__NAMESPACE__ . '\API_URL', 'http://192.168.247.129:9001/');
 
 /**
  * Class FCHelper
@@ -137,6 +137,13 @@ class Api
      */
     public function post($uri, $data = [])
     {
+        // PHP is loosely typed. Attempt to convert non string elements to string
+        foreach ($data as &$val) {
+            if (!is_string($val)) {
+                $val = strval($val);
+            }
+        }
+
         return $this->client->post($uri, [
             'body' => $data,
             'headers' => [
@@ -151,7 +158,7 @@ class Api
      */
     public function generateToken()
     {
-        $request = $this->call('auth/token', Constants::METHOD_POST, [
+        $request = $this->call('v1/auth/token', Constants::METHOD_POST, [
             'timestamp' => time(),
             'nonce' => $this->generateNonce(),
         ]);
